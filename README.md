@@ -45,7 +45,7 @@ npm run dev # client
 
 ### 데이터베이스 구조
 
-![Chat database structure](chat-database-structure.png)
+![Chat database structure](screenshot/chat-database-structure.png)
 
 네 개의 테이블 (`users`, `conversations`, `messages`, `group_members`)로 구성되었으며, 각 테이블의 연관된 컬럼 간에는 외래키 관계로 연결되어 있습니다. `users`와 `conversations` 테이블은 독립적이며, `messages`와 `group_members`가 이들을 참조하도록 하여 테이블 간 순환 참조를 없앴습니다.
 
