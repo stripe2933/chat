@@ -1,0 +1,4 @@
+[env]
+DATABASE_URL="sqlite://./database.db"
+SESSION_USERNAME_KEY="chat_session_username"
+PASSWORD_ENCRYPTION_SALT="SECRET_PASSWORD_SALT"
