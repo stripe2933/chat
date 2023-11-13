@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/stripe2933/Documents/chat/server/database.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2080"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/><expanded_item id="4" parent="1"/></tab_structure><tab_browse><current_table name="4,13:mainconversations"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1">DROP TABLE IF EXISTS joined_conversations;
+CREATE TEMP TABLE joined_conversations AS
+	SELECT conversations.id, conversations.name
+	FROM conversations
+	INNER JOIN
+		(SELECT conversation_id 
+		FROM group_members
+		WHERE username = 'username123') gm
+	ON conversations.id = gm.conversation_id;
+        
+DROP TABLE IF EXISTS last_messages_by_conversations;
+CREATE TEMP TABLE last_messages_by_conversations AS
+	SELECT jc.id AS conversation_id, json_object('id', messages.id, 'sender_username', sender_username, 'text', text, 'sent_at', MAX(sent_at)) AS message
+	FROM messages
+	INNER JOIN joined_conversations jc ON messages.conversation_id = jc.id
+	GROUP BY jc.id;
+            
+DROP TABLE IF EXISTS joined_members;
+CREATE TEMP TABLE joined_members AS
+	SELECT jm.conversation_id, users.username, users.nickname, users.profile_picture_filename, jm.joined_at
+	FROM users
+	INNER JOIN
+		(SELECT jc.id AS conversation_id, gm.username, gm.joined_at
+		FROM group_members gm
+		INNER JOIN joined_conversations jc
+		ON gm.conversation_id = jc.id) jm
+	USING (username);
+	
+SELECT json_object('id', conversation_id, 'name', conversation_name) AS conversation, 
+	   members,
+	   lmbc.message AS last_message
+FROM
+	(SELECT jc.id AS conversation_id, jc.name AS conversation_name, 
+			json_group_array(json_object('username', jmj.username, 'nickname', jmj.nickname, 'profile_picture_filename', jmj.profile_picture_filename)) AS members
+	FROM joined_conversations jc
+	INNER JOIN 
+		(SELECT *
+		FROM joined_members
+		ORDER BY joined_at ASC) jmj -- joined_members_json
+	ON jc.id = jmj.conversation_id
+	GROUP BY jc.id)
+LEFT JOIN last_messages_by_conversations lmbc USING (conversation_id) -- last message may not exists: use left join;</sql><current_tab id="0"/></tab_sql></sqlb_project>

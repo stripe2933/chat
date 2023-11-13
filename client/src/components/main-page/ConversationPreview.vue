@@ -14,11 +14,17 @@ const props = defineProps({
 });
 
 const lastMessagePreview = computed(() => {
-    const last_sender_username = props.conversation.last_sender_username;
-    if (last_sender_username){
-        // Get nickname of last sender.
-        const last_sender_nickname = props.conversation.members.find(p => p.username === last_sender_username).nickname;
-        return `${last_sender_nickname}: ${props.conversation.last_message_text}`;
+    const last_message = props.conversation.last_message;
+    if (last_message){
+        // Get nickname of sender.
+        const sender_username = last_message.sender_username;
+        if (sender_username == props.self){
+            return `You: ${props.conversation.last_message?.text || ""}`;
+        }
+        else{
+            const sender_nickname = props.conversation.members.find(p => p.username === sender_username)?.nickname;
+            return `${sender_nickname}: ${props.conversation.last_message?.text || ""}`;
+        }
     }
     else{
         return "";

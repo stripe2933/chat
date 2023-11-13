@@ -172,7 +172,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     // let text = text.clone().to_string();
                     
                     // let future = async move { 
-                    //     sqlx::query!("INSERT INTO messages (sender_username, text, sent_at) VALUES (?, ?, datetime('now'));", username, text)
+                    //     sqlx::query!("INSERT INTO messages (sender_username, text, sent_at) VALUES (?, ?, DATETIME('NOW'));", username, text)
                     //         .execute(database);
                     // };  
                     // let future = actix::fut::wrap_future(future);

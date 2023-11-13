@@ -21,7 +21,6 @@ let isDataLoaded = ref(false);
 
 const messages = ref([]);
 let currentMessage = ref('');
-// let socketStatus = ref(false);
 
 // Socket settings.
 let socket = null;

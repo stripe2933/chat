@@ -1,8 +1,7 @@
-use actix_web::web;
 use chrono::NaiveDateTime;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(sqlx::FromRow, Serialize, Debug)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, Debug)]
 pub struct Message{
     pub id: i64,
     pub sender_username: String,

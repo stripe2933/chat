@@ -14,6 +14,6 @@
 </script>
 
 <template>
-    <img class="cover aspect-square" 
+    <img class="cover aspect-square rounded-full" 
         :src="profilePictureUrl">
 </template>

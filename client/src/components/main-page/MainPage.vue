@@ -17,26 +17,60 @@ const newConversationMembers = ref([]);
 
 onMounted(async () => {
     const selfResponse = await fetch('https://localhost:8443/api/user/login_info', { mode: 'cors', credentials: 'include' });
+    if (!selfResponse.ok){
+        alert(`Failed to load self: ${await selfResponse.text()}`);
+        return;
+    }
+
     self.value = await selfResponse.json();
 
     const usersResponse = await fetch('https://localhost:8443/api/user/all');
-    usersExceptSelf.value = (await usersResponse.json())
-        .filter(user => user.username !== self.value.username);
+    if (usersResponse.ok){
+        usersExceptSelf.value = (await usersResponse.json())
+            .filter(user => user.username !== self.value.username);
+    }
+    else{
+        alert(`Failed to load users: ${await usersResponse.text()}`);
+    }
 
     const joinedConversationsResponse = await fetch('https://localhost:8443/api/conversation/joined', { mode: 'cors', credentials: 'include' });
-    joinedConversations.value = await joinedConversationsResponse.json();
+    if (joinedConversationsResponse.ok){
+        joinedConversations.value = await joinedConversationsResponse.json();
+    }
+    else{
+        alert(`Failed to load the joined conversations: ${await joinedConversationsResponse.text()}`);
+    }
 })
 
 function openNewConversationDialog() {
     newConversationDialogVisible.value = true;
 }
 
-async function submitNewConversation(event){
-    alert(newConversationName.value);
-    alert(newConversationMembers.value);
+async function createNewConversation(event){
+    let members = [...newConversationMembers.value];
+    members.push(self.value.username);
+
+    const response = await fetch(
+        'https://localhost:8443/api/conversation/', 
+        { 
+            method: 'POST', 
+            mode: 'cors', 
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                conversation_name: newConversationName.value,
+                members: members
+            })
+        }
+    );
+    if (!response.ok){
+        alert(await response.text());
+        return;
+    }
 
     newConversationDialogVisible.value = false;
-
 }
 </script>
 
@@ -79,7 +113,7 @@ async function submitNewConversation(event){
     <v-dialog v-model="newConversationDialogVisible" width="500">
         <template v-slot:default="{ isActive }">
             <v-card title="Create new conversation">
-                <v-form @submit.prevent="submitNewConversation">
+                <v-form @submit.prevent="createNewConversation">
                     <v-container>
                         <v-row>
                             <v-col cols="12">

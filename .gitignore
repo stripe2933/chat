@@ -1,2 +1,4 @@
 .DS_STORE
 .vscode
+cert.pem
+key.pem
