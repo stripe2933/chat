@@ -26,6 +26,7 @@ cargo run --release
 
 # Start client at https://localhost:5173
 cd ../client
+npm install
 npm run dev # client
 ```
 
